@@ -1,0 +1,3 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`snapshot: complex document > renders the README example consistently 1`] = `"<h1>Quarterly Report</h1><p><b>Team</b> achieved <i>record</i> growth.</p><hr/><ul><li><input type="checkbox" checked>Revenue +20%</li><li><code>New product launch</code></li></ul><table bordered striped><caption>Key metrics</caption><tr><th>Metric</th><th>Value</th></tr><tr><td>Speed</td><td align="right"><b>42</b></td></tr></table>"`;

@@ -1,0 +1,58 @@
+{
+  "name": "tg-rich-messages",
+  "version": "0.1.0",
+  "description": "Platform-independent builder for Telegram Rich Messages (HTML mode)",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/rich.d.ts",
+      "import": "./dist/rich.js"
+    }
+  },
+  "sideEffects": false,
+  "files": [
+    "dist"
+  ],
+  "engines": {
+    "node": "^22.0.0 || >=24.0.0"
+  },
+  "scripts": {
+    "prepublishOnly": "npm run build",
+    "build": "tsc",
+    "typecheck": "tsc --noEmit",
+    "test:watch": "vitest",
+    "test": "vitest run",
+    "format": "prettier . --write"
+  },
+  "keywords": [
+    "telegram",
+    "bot",
+    "rich messages",
+    "rich text",
+    "html",
+    "builder",
+    "sendRichMessage",
+    "tg-rich",
+    "telegram-api",
+    "rich messages api"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vdistortion/tg-rich-messages.git"
+  },
+  "bugs": {
+    "url": "https://github.com/vdistortion/tg-rich-messages/issues"
+  },
+  "homepage": "https://github.com/vdistortion/tg-rich-messages#readme",
+  "author": "Valentin <https://github.com/vdistortion>",
+  "license": "MIT",
+  "prettier": {
+    "singleQuote": true,
+    "printWidth": 100
+  },
+  "devDependencies": {
+    "prettier": "^3.8.4",
+    "typescript": "^6.0.3",
+    "vitest": "^4.1.9"
+  }
+}
