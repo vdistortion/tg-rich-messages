@@ -19,10 +19,25 @@ export interface InlineNode {
 export interface BlockNode {
   readonly [KIND]: 'block';
   render(): string;
+  readonly _meta?: BlockMeta;
 }
 
 export type Inline = string | number | InlineNode | readonly Inline[];
 export type BlockContent = BlockNode | readonly BlockContent[];
+
+interface BlockMeta {
+  children?: readonly BlockNode[];
+  items?: readonly ListItemMeta[];
+  rows?: number;
+}
+
+interface ListItemMeta {
+  content: Inline | BlockContent;
+  checkbox?: boolean;
+  checked?: boolean;
+  value?: number;
+  type?: LabelType;
+}
 
 function isInlineNode(v: unknown): v is InlineNode {
   return typeof v === 'object' && v !== null && (v as any)[KIND] === 'inline';
@@ -73,8 +88,8 @@ function renderFlow(content: Inline | BlockContent): string {
 function inline(render: () => string): InlineNode {
   return { [KIND]: 'inline', render };
 }
-function block(render: () => string): BlockNode {
-  return { [KIND]: 'block', render };
+function block(render: () => string, meta?: BlockMeta): BlockNode {
+  return { [KIND]: 'block', render, _meta: meta };
 }
 function wrap(name: string, content: Inline): InlineNode {
   return inline(() => `<${name}>${renderInline(content)}</${name}>`);
@@ -165,21 +180,29 @@ function isListItem(v: any): v is ListItem {
     'content' in v
   );
 }
-export function list(items: readonly ListItemInput[], options: ListOptions = {}): BlockNode {
-  return block(() => {
-    const tag = options.ordered ? 'ol' : 'ul';
-    const attrs: string[] = [];
-    if (options.ordered) {
-      if (options.start !== undefined) attrs.push(`start="${options.start}"`);
-      if (options.type) attrs.push(`type="${options.type}"`);
-      if (options.reversed) attrs.push('reversed');
-    }
-    const open = attrs.length ? `<${tag} ${attrs.join(' ')}>` : `<${tag}>`;
-    return `${open}${items.map(renderListItem).join('')}</${tag}>`;
-  });
+function normalizeItem(input: ListItemInput): ListItemMeta {
+  if (isListItem(input)) return input;
+  return { content: input as Inline | BlockContent };
 }
-function renderListItem(item: ListItemInput): string {
-  const it: ListItem = isListItem(item) ? item : { content: item as Inline | BlockContent };
+
+export function list(items: readonly ListItemInput[], options: ListOptions = {}): BlockNode {
+  const itemMetas = items.map(normalizeItem);
+  return block(
+    () => {
+      const tag = options.ordered ? 'ol' : 'ul';
+      const attrs: string[] = [];
+      if (options.ordered) {
+        if (options.start !== undefined) attrs.push(`start="${options.start}"`);
+        if (options.type) attrs.push(`type="${options.type}"`);
+        if (options.reversed) attrs.push('reversed');
+      }
+      const open = attrs.length ? `<${tag} ${attrs.join(' ')}>` : `<${tag}>`;
+      return `${open}${itemMetas.map(renderListItemMeta).join('')}</${tag}>`;
+    },
+    { items: itemMetas },
+  );
+}
+function renderListItemMeta(it: ListItemMeta): string {
   const attrs: string[] = [];
   if (it.value !== undefined) attrs.push(`value="${it.value}"`);
   if (it.type) attrs.push(`type="${it.type}"`);
@@ -191,11 +214,34 @@ function renderListItem(item: ListItemInput): string {
 }
 
 // quotes --------------------------------------------------------------------
+/** Extracts a flat list of BlockNode from Inline | BlockContent */
+function extractBlocks(content: Inline | BlockContent): BlockNode[] {
+  if (Array.isArray(content)) {
+    const result: BlockNode[] = [];
+    for (const c of content) {
+      if (Array.isArray(c)) {
+        result.push(...extractBlocks(c));
+      } else if (isBlockNode(c)) {
+        result.push(c);
+      }
+    }
+    return result;
+  }
+  if (isBlockNode(content)) {
+    return [content];
+  }
+  return [];
+}
+
 export function blockquote(content: Inline | BlockContent, credit?: Inline): BlockNode {
-  return block(() => {
-    const c = credit !== undefined ? `<cite>${renderInline(credit)}</cite>` : '';
-    return `<blockquote>${renderFlow(content)}${c}</blockquote>`;
-  });
+  const children = extractBlocks(content);
+  return block(
+    () => {
+      const c = credit !== undefined ? `<cite>${renderInline(credit)}</cite>` : '';
+      return `<blockquote>${renderFlow(content)}${c}</blockquote>`;
+    },
+    { children },
+  );
 }
 export function pullquote(text: Inline, credit?: Inline): BlockNode {
   return block(() => {
@@ -298,16 +344,19 @@ export function table(
     return Math.max(m, cols);
   }, 0);
   if (maxCols > 20) throw new TgRichError(`Table has ${maxCols} columns (max 20)`);
-  return block(() => {
-    const attrs: string[] = [];
-    if (options.bordered) attrs.push('bordered');
-    if (options.striped) attrs.push('striped');
-    const open = attrs.length ? `<table ${attrs.join(' ')}>` : '<table>';
-    const caption =
-      options.caption !== undefined ? `<caption>${renderInline(options.caption)}</caption>` : '';
-    const body = rows.map((row) => `<tr>${row.map(renderCell).join('')}</tr>`).join('');
-    return `${open}${caption}${body}</table>`;
-  });
+  return block(
+    () => {
+      const attrs: string[] = [];
+      if (options.bordered) attrs.push('bordered');
+      if (options.striped) attrs.push('striped');
+      const open = attrs.length ? `<table ${attrs.join(' ')}>` : '<table>';
+      const caption =
+        options.caption !== undefined ? `<caption>${renderInline(options.caption)}</caption>` : '';
+      const body = rows.map((row) => `<tr>${row.map(renderCell).join('')}</tr>`).join('');
+      return `${open}${caption}${body}</table>`;
+    },
+    { rows: rows.length },
+  );
 }
 function renderCell(cell: TableCellInput): string {
   const c: TableCell = isTableCell(cell) ? cell : { content: cell as Inline };
@@ -327,9 +376,11 @@ export function details(
   content: Inline | BlockContent,
   opts: { open?: boolean } = {},
 ): BlockNode {
+  const children = extractBlocks(content);
   return block(
     () =>
       `${opts.open ? '<details open>' : '<details>'}<summary>${renderInline(summary)}</summary>${renderFlow(content)}</details>`,
+    { children },
   );
 }
 export interface MapOptions {
@@ -359,7 +410,7 @@ export interface DocumentOptions {
   isRtl?: boolean;
   skipEntityDetection?: boolean;
 }
-const LIMITS = { textChars: 32768, blocks: 500, media: 50 };
+const LIMITS = { textChars: 32768, blocks: 500, media: 50, maxDepth: 16 };
 
 export class RichDocument {
   constructor(private readonly _blocks: readonly BlockNode[]) {}
@@ -379,6 +430,44 @@ export class RichDocument {
     const media = (html.match(/<(img|video|audio)\b/g) || []).length;
     if (media > LIMITS.media)
       throw new TgRichError(`${media} media attachments (max ${LIMITS.media})`);
+
+    // block count and depth
+    let totalBlocks = 0;
+    const walk = (nodes: readonly BlockNode[], depth: number) => {
+      for (const node of nodes) {
+        totalBlocks++;
+        if (depth > LIMITS.maxDepth) {
+          throw new TgRichError(`Nesting depth ${depth} exceeds limit ${LIMITS.maxDepth}`);
+        }
+        const meta = node._meta;
+        if (meta) {
+          if (meta.children) {
+            walk(meta.children, depth + 1);
+          }
+          if (meta.items) {
+            for (const item of meta.items) {
+              totalBlocks++; // list item is a separate block
+              if (depth + 1 > LIMITS.maxDepth) {
+                throw new TgRichError(
+                  `Nesting depth ${depth + 1} exceeds limit ${LIMITS.maxDepth}`,
+                );
+              }
+              const itemBlocks = extractBlocks(item.content);
+              if (itemBlocks.length > 0) {
+                walk(itemBlocks, depth + 2); // nesting inside the list item
+              }
+            }
+          }
+          if (meta.rows !== undefined) {
+            totalBlocks += meta.rows; // table rows
+          }
+        }
+      }
+    };
+    walk(this._blocks, 1);
+    if (totalBlocks > LIMITS.blocks) {
+      throw new TgRichError(`Total blocks ${totalBlocks} exceeds limit ${LIMITS.blocks}`);
+    }
     return this;
   }
   toInputRichMessage(opts: DocumentOptions = {}): InputRichMessage {

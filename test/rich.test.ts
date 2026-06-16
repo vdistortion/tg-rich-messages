@@ -50,6 +50,8 @@ import {
   fmtRich,
   RichDocument,
   TgRichError,
+  BlockNode,
+  BlockContent,
 } from '../src/rich.js';
 
 describe('escapeText', () => {
@@ -308,6 +310,51 @@ describe('validate', () => {
   it('returns this for chaining', () => {
     const d = doc(paragraph('x'));
     expect(d.validate()).toBe(d);
+  });
+
+  // block count and depth tests
+  it('allows exactly 500 blocks', () => {
+    const blocks = Array.from({ length: 500 }, () => paragraph('x'));
+    expect(() => doc(...blocks).validate()).not.toThrow();
+  });
+  it('throws on 501 blocks', () => {
+    const blocks = Array.from({ length: 501 }, () => paragraph('x'));
+    expect(() => doc(...blocks).validate()).toThrow(TgRichError);
+  });
+  it('counts list items as separate blocks', () => {
+    // list (1) + 3 items = 4 blocks
+    const d = doc(list(['a', 'b', 'c']));
+    expect(() => d.validate()).not.toThrow();
+    // 1 list + 500 items = 501 blocks
+    const many = Array.from({ length: 500 }, (_, i) => `item${i}`);
+    expect(() => doc(list(many)).validate()).toThrow(TgRichError);
+  });
+  it('counts nested blocks inside list items', () => {
+    // list (1) + item (1) + paragraph inside (1) = 3 blocks
+    const d = doc(list([{ content: paragraph('deep') }]));
+    expect(() => d.validate()).not.toThrow();
+  });
+  it('throws on depth > 16 with blockquote chain', () => {
+    let inner: BlockContent = paragraph('deep');
+    for (let i = 0; i < 16; i++) {
+      inner = blockquote(inner);
+    }
+    // depth: first blockquote = 2, last = 17 → error
+    expect(() => doc(inner as BlockNode).validate()).toThrow(TgRichError);
+  });
+  it('allows depth exactly 16', () => {
+    let inner: BlockContent = paragraph('ok');
+    for (let i = 0; i < 15; i++) {
+      inner = blockquote(inner);
+    }
+    expect(() => doc(inner as BlockNode).validate()).not.toThrow();
+  });
+  it('counts table rows as blocks', () => {
+    const rows = Array.from({ length: 20 }, () => ['cell']);
+    expect(() => doc(table(rows)).validate()).not.toThrow();
+    const manyRows = Array.from({ length: 500 }, () => ['cell']);
+    // 1 table + 500 rows = 501 blocks
+    expect(() => doc(table(manyRows)).validate()).toThrow(TgRichError);
   });
 });
 

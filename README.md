@@ -12,7 +12,7 @@ Fully typed, zero dependencies, tree-shakeable.
 - Media blocks: photo, video, animation, audio, voice – all with optional spoiler, caption and credit (`<figure>`/`<figcaption>`/`<cite>`).
 - Document builder: `doc()` collects blocks, `toHTML()` renders the final string, `toInputRichMessage()` returns the `InputRichMessage` object ready to pass to `sendRichMessage`.
 - Template literal `fmtRich` for natural mixing of text, inline elements and blocks with automatic paragraph grouping.
-- Validation: checks text length (≤ 32768 UTF-8 characters, approximate) and media count (≤ 50). (Other limits like max blocks and nesting can be added externally or in a custom validator.)
+- Validation: checks text length (≤ 32768 UTF-8 code points, approximate), media count (≤ 50), total number of blocks (≤ 500), and maximum nesting depth (≤ 16).
 - Zero runtime dependencies; TypeScript-first with full type safety.
 
 ## Installation
@@ -177,8 +177,8 @@ The built-in `validate()` checks:
 
 - Total text (excluding tags) must not exceed **32768 UTF-8 characters** (counted as Unicode code points; approximate, since entities/tags are stripped heuristically).
 - Total media attachments (img, video, audio) must not exceed **50**.
-
-Additional limits (max 500 blocks, max 16 nesting levels) are not enforced by the library (the Telegram API will validate them). You can extend `validate()` or add your own checks.
+- Total number of blocks must not exceed **500** (including nested blocks, list items, and table rows).
+- Maximum nesting depth must not exceed **16**.
 
 ## Building a Complex Message
 
@@ -271,10 +271,7 @@ The library is written in TypeScript and ships with type declarations. No additi
 ## Contributing & Roadmap
 
 - [ ] Add `<tg-thinking>` support for draft messages.
-- [ ] Optional block count and nesting depth validation.
 
 Pull requests welcome!
 
-## License
-
-MIT
+> ⭐ Like this tool? Give it a star on [GitHub](https://github.com/vdistortion/tg-rich-messages) – it helps others discover the project!
