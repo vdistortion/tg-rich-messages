@@ -106,6 +106,7 @@ export const sub = (t: Inline) => wrap('sub', t);
 export const sup = (t: Inline) => wrap('sup', t);
 export const spoiler = (t: Inline) => wrap('tg-spoiler', t);
 export const br = () => inline(() => '<br>');
+export const unsafeRawInline = (input: string) => inline(() => input);
 
 export const link = (t: Inline, url: string) =>
   inline(() => `<a href="${escapeAttr(url)}">${renderInline(t)}</a>`);
