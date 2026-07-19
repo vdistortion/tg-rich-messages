@@ -7,7 +7,7 @@ Fully typed, zero dependencies, tree-shakeable.
 
 ## Features
 
-- All inline formatting: bold, italic, underline, strikethrough, spoiler, code, marked, sub, sup, line breaks, rawInline, links, anchors, references, custom emoji, date/time, math.
+- All inline formatting: bold, italic, underline, strikethrough, spoiler, code, marked, sub, sup, line breaks, unsafeRawInline, links, anchors, references, custom emoji, date/time, math.
 - All block elements: paragraphs, headings (1–6), preformatted code (with language), footers, dividers, math blocks, anchors, lists (ordered/unordered with full options, checkboxes), blockquotes, pullquotes, tables (with alignment, spanning, borders, stripes, captions), details (expandable blocks), maps, collages, slideshows.
 - Media blocks: photo, video, animation, audio, voice – all with optional spoiler, caption and credit (`<figure>`/`<figcaption>`/`<cite>`).
 - Document builder: `doc()` collects blocks, `toHTML()` renders the final string, `toInputRichMessage()` returns the `InputRichMessage` object ready to pass to `sendRichMessage`.
@@ -72,29 +72,29 @@ console.log(message.toHTML());
 
 All accept `Inline` content: strings, numbers, other inline nodes, or arrays of them.
 
-| Function                       | HTML output                                | Notes              |
-| ------------------------------ | ------------------------------------------ | ------------------ |
-| `bold(text)`                   | `<b>…</b>`                                 |                    |
-| `italic(text)`                 | `<i>…</i>`                                 |                    |
-| `underline(text)`              | `<u>…</u>`                                 |                    |
-| `strike(text)`                 | `<s>…</s>`                                 |                    |
-| `spoiler(text)`                | `<tg-spoiler>…</tg-spoiler>`               |                    |
-| `code(text)`                   | `<code>…</code>`                           |                    |
-| `marked(text)`                 | `<mark>…</mark>`                           |                    |
-| `sub(text)`                    | `<sub>…</sub>`                             |                    |
-| `sup(text)`                    | `<sup>…</sup>`                             |                    |
-| `br()`                         | `<br>`                                     | line break         |
-| `rawInline(input)`             | as-is                                      | not escaped        |
-| `link(text, url)`              | `<a href="…">…</a>`                        | URL is escaped     |
-| `email(text, address)`         | `<a href="mailto:…">…</a>`                 |                    |
-| `phone(text, number)`          | `<a href="tel:…">…</a>`                    |                    |
-| `userMention(text, userId)`    | `<a href="tg://user?id=…">…</a>`           |                    |
-| `emoji(emojiId, alt)`          | `<tg-emoji emoji-id="…">alt</tg-emoji>`    |                    |
-| `dateTime(text, unix, format)` | `<tg-time unix="…" format="…">…</tg-time>` | format like `wDT`  |
-| `math(latex)`                  | `<tg-math>…</tg-math>`                     |                    |
-| `anchorLink(text, name?)`      | `<a href="#…">…</a>`                       | empty name = top   |
-| `reference(text, name)`        | `<tg-reference name="…">…</tg-reference>`  |                    |
-| `referenceLink(text, name)`    | `<a href="#…">…</a>`                       | links to reference |
+| Function                       | HTML output                                | Notes                                      |
+| ------------------------------ | ------------------------------------------ | ------------------------------------------ |
+| `bold(text)`                   | `<b>…</b>`                                 |                                            |
+| `italic(text)`                 | `<i>…</i>`                                 |                                            |
+| `underline(text)`              | `<u>…</u>`                                 |                                            |
+| `strike(text)`                 | `<s>…</s>`                                 |                                            |
+| `spoiler(text)`                | `<tg-spoiler>…</tg-spoiler>`               |                                            |
+| `code(text)`                   | `<code>…</code>`                           |                                            |
+| `marked(text)`                 | `<mark>…</mark>`                           |                                            |
+| `sub(text)`                    | `<sub>…</sub>`                             |                                            |
+| `sup(text)`                    | `<sup>…</sup>`                             |                                            |
+| `br()`                         | `<br>`                                     | line break                                 |
+| `unsafeRawInline(input)`       | as-is                                      | not escaped, should use trusted HTML input |
+| `link(text, url)`              | `<a href="…">…</a>`                        | URL is escaped                             |
+| `email(text, address)`         | `<a href="mailto:…">…</a>`                 |                                            |
+| `phone(text, number)`          | `<a href="tel:…">…</a>`                    |                                            |
+| `userMention(text, userId)`    | `<a href="tg://user?id=…">…</a>`           |                                            |
+| `emoji(emojiId, alt)`          | `<tg-emoji emoji-id="…">alt</tg-emoji>`    |                                            |
+| `dateTime(text, unix, format)` | `<tg-time unix="…" format="…">…</tg-time>` | format like `wDT`                          |
+| `math(latex)`                  | `<tg-math>…</tg-math>`                     |                                            |
+| `anchorLink(text, name?)`      | `<a href="#…">…</a>`                       | empty name = top                           |
+| `reference(text, name)`        | `<tg-reference name="…">…</tg-reference>`  |                                            |
+| `referenceLink(text, name)`    | `<a href="#…">…</a>`                       | links to reference                         |
 
 ### Block Builders (return `BlockNode`)
 
@@ -172,7 +172,7 @@ Template literal that:
 
 Exported `escapeText(str: string): string` – escapes `&`, `<`, `>`, `"`, `'`. Used internally.
 
-Use `rawInline(input)` when you need trusted text or HTML inserted without any modifications.
+Use `unsafeRawInline(input)` only with trusted HTML, it inserts `input` as-is with no escaping.
 
 ## Validation Limits
 
