@@ -7,7 +7,7 @@ Fully typed, zero dependencies, tree-shakeable.
 
 ## Features
 
-- All inline formatting: bold, italic, underline, strikethrough, spoiler, code, marked, sub, sup, line breaks, links, anchors, references, custom emoji, date/time, math.
+- All inline formatting: bold, italic, underline, strikethrough, spoiler, code, marked, sub, sup, line breaks, rawInline, links, anchors, references, custom emoji, date/time, math.
 - All block elements: paragraphs, headings (1–6), preformatted code (with language), footers, dividers, math blocks, anchors, lists (ordered/unordered with full options, checkboxes), blockquotes, pullquotes, tables (with alignment, spanning, borders, stripes, captions), details (expandable blocks), maps, collages, slideshows.
 - Media blocks: photo, video, animation, audio, voice – all with optional spoiler, caption and credit (`<figure>`/`<figcaption>`/`<cite>`).
 - Document builder: `doc()` collects blocks, `toHTML()` renders the final string, `toInputRichMessage()` returns the `InputRichMessage` object ready to pass to `sendRichMessage`.
@@ -84,6 +84,7 @@ All accept `Inline` content: strings, numbers, other inline nodes, or arrays of 
 | `sub(text)`                    | `<sub>…</sub>`                             |                    |
 | `sup(text)`                    | `<sup>…</sup>`                             |                    |
 | `br()`                         | `<br>`                                     | line break         |
+| `raw(input)`                   | as-is                                      | not escaped        |
 | `link(text, url)`              | `<a href="…">…</a>`                        | URL is escaped     |
 | `email(text, address)`         | `<a href="mailto:…">…</a>`                 |                    |
 | `phone(text, number)`          | `<a href="tel:…">…</a>`                    |                    |
@@ -170,6 +171,8 @@ Template literal that:
 ### Escaping
 
 Exported `escapeText(str: string): string` – escapes `&`, `<`, `>`, `"`, `'`. Used internally.
+
+Use `rawInline(input)` when you need trusted text or HTML inserted without any modifications.
 
 ## Validation Limits
 
