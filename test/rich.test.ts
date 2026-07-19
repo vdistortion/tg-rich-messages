@@ -11,7 +11,7 @@ import {
   sup,
   spoiler,
   br,
-  rawInline,
+  unsafeRawInline,
   link,
   email,
   phone,
@@ -116,9 +116,9 @@ describe('inline builders', () => {
     );
   });
 
-  it('rawInline returns text as is', () => {
-    expect(rawInline('<b>x</b> & y').render()).toBe('<b>x</b> & y');
-    expect(paragraph([rawInline('<i>a</i>'), ' & ', bold('<')]).render()).toBe(
+  it('unsafeRawInline returns text as is', () => {
+    expect(unsafeRawInline('<b>x</b> & y').render()).toBe('<b>x</b> & y');
+    expect(paragraph([unsafeRawInline('<i>a</i>'), ' & ', bold('<')]).render()).toBe(
       '<p><i>a</i> &amp; <b>&lt;</b></p>',
     );
   });
