@@ -84,7 +84,7 @@ All accept `Inline` content: strings, numbers, other inline nodes, or arrays of 
 | `sub(text)`                    | `<sub>…</sub>`                             |                    |
 | `sup(text)`                    | `<sup>…</sup>`                             |                    |
 | `br()`                         | `<br>`                                     | line break         |
-| `raw(input)`                   | as-is                                      | not escaped        |
+| `rawInline(input)`             | as-is                                      | not escaped        |
 | `link(text, url)`              | `<a href="…">…</a>`                        | URL is escaped     |
 | `email(text, address)`         | `<a href="mailto:…">…</a>`                 |                    |
 | `phone(text, number)`          | `<a href="tel:…">…</a>`                    |                    |
