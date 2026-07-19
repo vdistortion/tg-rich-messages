@@ -116,7 +116,7 @@ describe('inline builders', () => {
     );
   });
 
-  it('unsafeRawInline returns text as is', () => {
+  it('unsafeRawInline returns input as is', () => {
     expect(unsafeRawInline('<b>x</b> & y').render()).toBe('<b>x</b> & y');
     expect(paragraph([unsafeRawInline('<i>a</i>'), ' & ', bold('<')]).render()).toBe(
       '<p><i>a</i> &amp; <b>&lt;</b></p>',
