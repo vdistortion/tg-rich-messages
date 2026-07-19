@@ -11,6 +11,7 @@ import {
   sup,
   spoiler,
   br,
+  rawInline,
   link,
   email,
   phone,
@@ -112,6 +113,13 @@ describe('inline builders', () => {
     expect(br().render()).toBe('<br>');
     expect(blockquote(['line1', br(), 'line2']).render()).toBe(
       '<blockquote>line1<br>line2</blockquote>',
+    );
+  });
+
+  it('rawInline returns text as is', () => {
+    expect(rawInline('<b>x</b> & y').render()).toBe('<b>x</b> & y');
+    expect(paragraph([rawInline('<i>a</i>'), ' & ', bold('<')]).render()).toBe(
+      '<p><i>a</i> &amp; <b>&lt;</b></p>',
     );
   });
 });
