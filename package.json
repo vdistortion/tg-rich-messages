@@ -1,6 +1,6 @@
 {
   "name": "tg-rich-messages",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Platform-independent builder for Telegram Rich Messages (HTML mode)",
   "type": "module",
   "typings": "./dist/rich.d.ts",
