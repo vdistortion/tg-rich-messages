@@ -2,6 +2,7 @@
 
 Platform-independent TypeScript builder for Telegram Rich Messages (HTML mode).
 
+This library is compatible with **Telegram Bot API version 10.2** ([official API documentation](https://core.telegram.org/bots/api)).  
 Generates valid Telegram HTML for the [Rich Messages API](https://core.telegram.org/bots/api#rich-messages).  
 Fully typed, zero dependencies, tree-shakeable.
 
