@@ -22,6 +22,7 @@ import {
   anchorLink,
   reference,
   referenceLink,
+  button,
   escapeText,
   // block
   paragraph,
@@ -36,6 +37,7 @@ import {
   list,
   blockquote,
   pullquote,
+  buttonRow,
   details,
   map,
   table,
@@ -45,6 +47,7 @@ import {
   animation,
   audio,
   voice,
+  document,
   collage,
   slideshow,
   // doc
@@ -110,6 +113,21 @@ describe('inline builders', () => {
     expect(referenceLink('r', 'n1').render()).toBe('<a href="#n1">r</a>');
   });
 
+  it('buttons render supported attributes and escape values', () => {
+    expect(
+      button('Go & copy', {
+        type: 'callback_data',
+        style: 'link',
+        data: 'a&b"c',
+        forwardText: 'Forward <this>',
+        requestWriteAccess: true,
+        allowUserChats: true,
+      }).render(),
+    ).toBe(
+      '<tg-button type="callback_data" style="link" data="a&amp;b&quot;c" forward-text="Forward &lt;this&gt;" request-write-access allow-user-chats>Go &amp; copy</tg-button>',
+    );
+  });
+
   it('br', () => {
     expect(br().render()).toBe('<br>');
     expect(blockquote(['line1', br(), 'line2']).render()).toBe(
@@ -150,6 +168,17 @@ describe('block builders', () => {
     expect(mathBlock('E=mc^2').render()).toBe('<tg-math-block>E=mc^2</tg-math-block>');
     expect(thinking('<working>').render()).toBe('<tg-thinking>&lt;working&gt;</tg-thinking>');
     expect(anchor('c1').render()).toBe('<a name="c1"></a>');
+  });
+
+  it('expandable blockquotes and button rows', () => {
+    const first = button('Open', { type: 'url', url: 'https://example.com' });
+    const second = button('Copy', { type: 'copy_text', text: 'value' });
+    expect(blockquote('Details', undefined, { expandable: true }).render()).toBe(
+      '<blockquote expandable>Details</blockquote>',
+    );
+    expect(buttonRow([first, second], { align: 'center' }).render()).toBe(
+      '<tg-button-row align="center"><tg-button type="url" url="https://example.com">Open</tg-button><tg-button type="copy_text" text="value">Copy</tg-button></tg-button-row>',
+    );
   });
 });
 
@@ -213,6 +242,11 @@ describe('media', () => {
     expect(animation('u').render()).toBe('<video src="u"></video>');
     expect(audio('u').render()).toBe('<audio src="u"></audio>');
     expect(voice('u').render()).toBe('<audio src="u"></audio>');
+  });
+  it('document with escaped URL and caption', () => {
+    expect(document('https://example.com/a?x=1&y=2', { caption: 'File' }).render()).toBe(
+      '<figure><tg-document src="https://example.com/a?x=1&amp;y=2"></tg-document><figcaption>File</figcaption></figure>',
+    );
   });
   it('collage / slideshow', () => {
     expect(
@@ -316,6 +350,8 @@ describe('validate', () => {
     expect(() => ok.validate()).not.toThrow();
     const bad = doc(Array.from({ length: 51 }, () => photo('u.jpg')));
     expect(() => bad.validate()).toThrow(TgRichError);
+    const documents = doc(Array.from({ length: 51 }, () => document('u.zip')));
+    expect(() => documents.validate()).toThrow(TgRichError);
   });
   it('returns this for chaining', () => {
     const d = doc(paragraph('x'));
