@@ -9,8 +9,8 @@ Fully typed, zero dependencies, tree-shakeable.
 ## Features
 
 - All inline formatting: bold, italic, underline, strikethrough, spoiler, code, marked, sub, sup, line breaks, unsafeRawInline, links, anchors, references, custom emoji, date/time, math, and buttons.
-- All block elements: paragraphs, headings (1–6), preformatted code (with language), footers, dividers, math blocks, anchors, lists (ordered/unordered with full options, checkboxes), blockquotes (including expandable), pullquotes, tables (with alignment, spanning, borders, stripes, compact mode and captions), details (expandable blocks), maps, collages, slideshows, and button rows.
-- Media blocks: photo, video, animation, audio, voice, and document – all with optional spoiler, caption and credit (`<figure>`/`<figcaption>`/`<cite>`).
+- Rich block elements: paragraphs, headings (1–6), preformatted code (with language), footers, dividers, math blocks, anchors, lists (ordered/unordered with full options, checkboxes), blockquotes (including expandable), pullquotes, tables (with alignment, spanning, borders, stripes, compact mode and captions), details (expandable blocks), maps, collages, slideshows, and button rows.
+- Media blocks: photo, video, animation, audio, voice, and document, with captions and credits; visual media also supports spoilers (`<figure>`/`<figcaption>`/`<cite>`).
 - Document builder: `doc()` collects blocks, `toHTML()` renders the final string, `toInputRichMessage()` returns the `InputRichMessage` object ready to pass to `sendRichMessage`.
 - Template literal `fmtRich` for natural mixing of text, inline elements and blocks with automatic paragraph grouping.
 - Validation: checks text length (≤ 32768 UTF-8 code points, approximate), media count (≤ 50), total number of blocks (≤ 500), and maximum nesting depth (≤ 16).
@@ -108,8 +108,9 @@ All accept `Inline` content: strings, numbers, other inline nodes, or arrays of 
 | `footer(text)`                     | `<footer>…</footer>`                                             |                                                                                          |
 | `divider()`                        | `<hr/>`                                                          |                                                                                          |
 | `mathBlock(latex)`                 | `<tg-math-block>…</tg-math-block>`                               |                                                                                          |
+| `thinking(text)`                   | `<tg-thinking>…</tg-thinking>`                                  | only for `sendRichMessageDraft`                                                         |
 | `anchor(name)`                     | `<a name="…"></a>`                                               | standalone anchor                                                                        |
-| `blockquote(content, credit?)`     | `<blockquote>…<cite>…</cite></blockquote>`                       | content can be inline or block                                                           |
+| `blockquote(content, credit?, opts?)` | `<blockquote>…<cite>…</cite></blockquote>`                     | content can be inline or block; supports `expandable`                         |
 | `pullquote(text, credit?)`         | `<aside>…<cite>…</cite></aside>`                                 |                                                                                          |
 | `list(items, options?)`            | `<ul>…</ul>` or `<ol>…</ol>` with `<li>`                         | supports `ordered`, `start`, `type`, `reversed`, `value`, `checkbox`, `checked` per item |
 | `details(summary, content, opts?)` | `<details [open]>…</details>`                                    | content can be inline or block                                                           |
@@ -183,7 +184,7 @@ Use `unsafeRawInline(input)` only with trusted HTML, it inserts `input` as-is wi
 The built-in `validate()` checks:
 
 - Total text (excluding tags) must not exceed **32768 UTF-8 characters** (counted as Unicode code points; approximate, since entities/tags are stripped heuristically).
-- Total media attachments (img, video, audio) must not exceed **50**.
+- Total media attachments (img, video, audio, and tg-document) must not exceed **50**.
 - Total number of blocks must not exceed **500** (including nested blocks, list items, and table rows).
 - Maximum nesting depth must not exceed **16**.
 
@@ -275,9 +276,7 @@ await fetch(`https://api.telegram.org/bot${TOKEN}/sendRichMessage`, {
 
 The library is written in TypeScript and ships with type declarations. No additional setup needed.
 
-## Contributing & Roadmap
-
-- [ ] Add `<tg-thinking>` support for draft messages.
+## Contributing
 
 Pull requests welcome!
 

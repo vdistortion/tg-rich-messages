@@ -4,6 +4,7 @@
 
 ### Added
 
+- Added `thinking()` for the `<tg-thinking>` placeholder used by `sendRichMessageDraft`.
 - Bot API 10.3 support for inline buttons (`button()`), button rows (`buttonRow()`), expandable blockquotes, compact tables, and document media (`document()`).
 - Document media is included in `validate()` attachment counting.
 

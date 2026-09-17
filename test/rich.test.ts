@@ -31,6 +31,7 @@ import {
   footer,
   divider,
   mathBlock,
+  thinking,
   anchor,
   list,
   blockquote,
@@ -143,10 +144,11 @@ describe('block builders', () => {
     expect(pre('x', 'python').render()).toBe('<pre><code class="language-python">x</code></pre>');
   });
 
-  it('footer / divider / mathBlock / anchor', () => {
+  it('footer / divider / mathBlock / thinking / anchor', () => {
     expect(footer('f').render()).toBe('<footer>f</footer>');
     expect(divider().render()).toBe('<hr/>');
     expect(mathBlock('E=mc^2').render()).toBe('<tg-math-block>E=mc^2</tg-math-block>');
+    expect(thinking('<working>').render()).toBe('<tg-thinking>&lt;working&gt;</tg-thinking>');
     expect(anchor('c1').render()).toBe('<a name="c1"></a>');
   });
 });

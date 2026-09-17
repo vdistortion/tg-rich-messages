@@ -203,6 +203,7 @@ export const footer = (t: Inline) => block(() => `<footer>${renderInline(t)}</fo
 export const divider = () => block(() => `<hr/>`);
 export const mathBlock = (latex: string) =>
   block(() => `<tg-math-block>${escapeText(latex)}</tg-math-block>`);
+export const thinking = (text: Inline) => block(() => `<tg-thinking>${renderInline(text)}</tg-thinking>`);
 export const anchor = (name: string) => block(() => `<a name="${escapeAttr(name)}"></a>`);
 
 // list ----------------------------------------------------------------------
