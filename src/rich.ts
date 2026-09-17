@@ -132,6 +132,57 @@ export const reference = (t: Inline, name: string) =>
 export const referenceLink = (t: Inline, name: string) =>
   inline(() => `<a href="#${escapeAttr(name)}">${renderInline(t)}</a>`);
 
+// buttons --------------------------------------------------------------------
+export type RichButtonType =
+  | 'url'
+  | 'callback_data'
+  | 'web_app'
+  | 'login_url'
+  | 'switch_inline_query'
+  | 'switch_inline_query_current_chat'
+  | 'switch_inline_query_chosen_chat'
+  | 'copy_text'
+  | 'disabled';
+export type RichButtonStyle = 'danger' | 'success' | 'primary' | 'link';
+export interface ButtonOptions {
+  type: RichButtonType;
+  style?: RichButtonStyle;
+  url?: string;
+  data?: string;
+  forwardText?: string;
+  requestWriteAccess?: boolean;
+  query?: string;
+  text?: string;
+  allowUserChats?: boolean;
+  allowBotChats?: boolean;
+  allowGroupChats?: boolean;
+  allowChannelChats?: boolean;
+}
+function buttonAttrs(options: ButtonOptions): string {
+  const attrs: string[] = [`type="${options.type}"`];
+  const add = (name: string, value: string | undefined) => {
+    if (value !== undefined) attrs.push(`${name}="${escapeAttr(value)}"`);
+  };
+  if (options.style) add('style', options.style);
+  add('url', options.url);
+  add('data', options.data);
+  add('forward-text', options.forwardText);
+  add('query', options.query);
+  add('text', options.text);
+  for (const [key, attr] of [
+    ['requestWriteAccess', 'request-write-access'],
+    ['allowUserChats', 'allow-user-chats'],
+    ['allowBotChats', 'allow-bot-chats'],
+    ['allowGroupChats', 'allow-group-chats'],
+    ['allowChannelChats', 'allow-channel-chats'],
+  ] as const) {
+    if (options[key]) attrs.push(attr);
+  }
+  return attrs.join(' ');
+}
+export const button = (content: Inline, options: ButtonOptions) =>
+  inline(() => `<tg-button ${buttonAttrs(options)}>${renderInline(content)}</tg-button>`);
+
 // ----- block builders (RichBlock.*) ----------------------------------------
 export const paragraph = (t: Inline) => block(() => `<p>${renderInline(t)}</p>`);
 export const p = paragraph;
@@ -234,12 +285,19 @@ function extractBlocks(content: Inline | BlockContent): BlockNode[] {
   return [];
 }
 
-export function blockquote(content: Inline | BlockContent, credit?: Inline): BlockNode {
+export interface BlockquoteOptions {
+  expandable?: boolean;
+}
+export function blockquote(
+  content: Inline | BlockContent,
+  credit?: Inline,
+  options: BlockquoteOptions = {},
+): BlockNode {
   const children = extractBlocks(content);
   return block(
     () => {
       const c = credit !== undefined ? `<cite>${renderInline(credit)}</cite>` : '';
-      return `<blockquote>${renderFlow(content)}${c}</blockquote>`;
+      return `<blockquote${options.expandable ? ' expandable' : ''}>${renderFlow(content)}${c}</blockquote>`;
     },
     { children },
   );
@@ -248,6 +306,19 @@ export function pullquote(text: Inline, credit?: Inline): BlockNode {
   return block(() => {
     const c = credit !== undefined ? `<cite>${renderInline(credit)}</cite>` : '';
     return `<aside>${renderInline(text)}${c}</aside>`;
+  });
+}
+
+export interface ButtonRowOptions {
+  align?: 'left' | 'center' | 'right';
+}
+export function buttonRow(
+  buttons: readonly InlineNode[],
+  options: ButtonRowOptions = {},
+): BlockNode {
+  return block(() => {
+    const align = options.align ? ` align="${options.align}"` : '';
+    return `<tg-button-row${align}>${buttons.map((b) => b.render()).join('')}</tg-button-row>`;
   });
 }
 
@@ -275,6 +346,13 @@ function mediaBlock(
 ): BlockNode {
   return block(() => {
     const el = mediaElement(tag, url, opts.spoiler);
+    if (opts.caption === undefined && opts.credit === undefined) return el;
+    return `<figure>${el}${captionMarkup(opts)}</figure>`;
+  });
+}
+export function document(url: string, opts: MediaOptions = {}): BlockNode {
+  return block(() => {
+    const el = `<tg-document src="${escapeAttr(url)}"></tg-document>`;
     if (opts.caption === undefined && opts.credit === undefined) return el;
     return `<figure>${el}${captionMarkup(opts)}</figure>`;
   });
@@ -326,6 +404,7 @@ export type TableCellInput = Inline | TableCell;
 export interface TableOptions {
   bordered?: boolean;
   striped?: boolean;
+  compact?: boolean;
   caption?: Inline;
 }
 function isTableCell(v: any): v is TableCell {
@@ -350,6 +429,7 @@ export function table(
       const attrs: string[] = [];
       if (options.bordered) attrs.push('bordered');
       if (options.striped) attrs.push('striped');
+      if (options.compact) attrs.push('compact');
       const open = attrs.length ? `<table ${attrs.join(' ')}>` : '<table>';
       const caption =
         options.caption !== undefined ? `<caption>${renderInline(options.caption)}</caption>` : '';
@@ -428,7 +508,7 @@ export class RichDocument {
     const chars = [...stripTagsToText(html)].length;
     if (chars > LIMITS.textChars)
       throw new TgRichError(`text is ${chars} characters (max ${LIMITS.textChars})`);
-    const media = (html.match(/<(img|video|audio)\b/g) || []).length;
+    const media = (html.match(/<(img|video|audio|tg-document)\b/g) || []).length;
     if (media > LIMITS.media)
       throw new TgRichError(`${media} media attachments (max ${LIMITS.media})`);
 

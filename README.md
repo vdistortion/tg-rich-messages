@@ -2,15 +2,15 @@
 
 Platform-independent TypeScript builder for Telegram Rich Messages (HTML mode).
 
-This library is compatible with **Telegram Bot API version 10.2** ([official API documentation](https://core.telegram.org/bots/api)).  
+This library is compatible with **Telegram Bot API version 10.3** ([official API documentation](https://core.telegram.org/bots/api)).
 Generates valid Telegram HTML for the [Rich Messages API](https://core.telegram.org/bots/api#rich-messages).  
 Fully typed, zero dependencies, tree-shakeable.
 
 ## Features
 
-- All inline formatting: bold, italic, underline, strikethrough, spoiler, code, marked, sub, sup, line breaks, unsafeRawInline, links, anchors, references, custom emoji, date/time, math.
-- All block elements: paragraphs, headings (1–6), preformatted code (with language), footers, dividers, math blocks, anchors, lists (ordered/unordered with full options, checkboxes), blockquotes, pullquotes, tables (with alignment, spanning, borders, stripes, captions), details (expandable blocks), maps, collages, slideshows.
-- Media blocks: photo, video, animation, audio, voice – all with optional spoiler, caption and credit (`<figure>`/`<figcaption>`/`<cite>`).
+- All inline formatting: bold, italic, underline, strikethrough, spoiler, code, marked, sub, sup, line breaks, unsafeRawInline, links, anchors, references, custom emoji, date/time, math, and buttons.
+- All block elements: paragraphs, headings (1–6), preformatted code (with language), footers, dividers, math blocks, anchors, lists (ordered/unordered with full options, checkboxes), blockquotes (including expandable), pullquotes, tables (with alignment, spanning, borders, stripes, compact mode and captions), details (expandable blocks), maps, collages, slideshows, and button rows.
+- Media blocks: photo, video, animation, audio, voice, and document – all with optional spoiler, caption and credit (`<figure>`/`<figcaption>`/`<cite>`).
 - Document builder: `doc()` collects blocks, `toHTML()` renders the final string, `toInputRichMessage()` returns the `InputRichMessage` object ready to pass to `sendRichMessage`.
 - Template literal `fmtRich` for natural mixing of text, inline elements and blocks with automatic paragraph grouping.
 - Validation: checks text length (≤ 32768 UTF-8 code points, approximate), media count (≤ 50), total number of blocks (≤ 500), and maximum nesting depth (≤ 16).
@@ -96,6 +96,7 @@ All accept `Inline` content: strings, numbers, other inline nodes, or arrays of 
 | `anchorLink(text, name?)`      | `<a href="#…">…</a>`                       | empty name = top                           |
 | `reference(text, name)`        | `<tg-reference name="…">…</tg-reference>`  |                                            |
 | `referenceLink(text, name)`    | `<a href="#…">…</a>`                       | links to reference                         |
+| `button(text, options)`        | `<tg-button type="…">…</tg-button>`         | URL, callback, Web App, copy and other buttons |
 
 ### Block Builders (return `BlockNode`)
 
@@ -112,8 +113,10 @@ All accept `Inline` content: strings, numbers, other inline nodes, or arrays of 
 | `pullquote(text, credit?)`         | `<aside>…<cite>…</cite></aside>`                                 |                                                                                          |
 | `list(items, options?)`            | `<ul>…</ul>` or `<ol>…</ol>` with `<li>`                         | supports `ordered`, `start`, `type`, `reversed`, `value`, `checkbox`, `checked` per item |
 | `details(summary, content, opts?)` | `<details [open]>…</details>`                                    | content can be inline or block                                                           |
-| `table(rows, options?)`            | `<table [bordered] [striped]><caption>…</caption>…</table>`      | cells: `content`, `header`, `colspan`, `rowspan`, `align`, `valign`                      |
+| `table(rows, options?)`            | `<table [bordered] [striped] [compact]>…</table>`              | cells: `content`, `header`, `colspan`, `rowspan`, `align`, `valign`                      |
 | `map(lat, long, zoom, opts?)`      | `<tg-map lat="…" long="…" zoom="…"/>`                            | optionally wrapped in `<figure>`                                                         |
+| `buttonRow(buttons, opts?)`        | `<tg-button-row>…</tg-button-row>`                                  | optional left/center/right alignment                                                     |
+| `document(url, opts?)`             | `<tg-document src="…"></tg-document>`                              | optional caption and credit                                                             |
 
 ### Media Builders
 

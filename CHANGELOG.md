@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.4.0 — 2026-08-24
+
+### Added
+
+- Bot API 10.3 support for inline buttons (`button()`), button rows (`buttonRow()`), expandable blockquotes, compact tables, and document media (`document()`).
+- Document media is included in `validate()` attachment counting.
+
+---
+
 ## 0.3.0 — 2026-07-20
 
 ### Added
