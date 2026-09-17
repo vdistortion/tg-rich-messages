@@ -73,51 +73,51 @@ console.log(message.toHTML());
 
 All accept `Inline` content: strings, numbers, other inline nodes, or arrays of them.
 
-| Function                       | HTML output                                | Notes                                      |
-| ------------------------------ | ------------------------------------------ | ------------------------------------------ |
-| `bold(text)`                   | `<b>…</b>`                                 |                                            |
-| `italic(text)`                 | `<i>…</i>`                                 |                                            |
-| `underline(text)`              | `<u>…</u>`                                 |                                            |
-| `strike(text)`                 | `<s>…</s>`                                 |                                            |
-| `spoiler(text)`                | `<tg-spoiler>…</tg-spoiler>`               |                                            |
-| `code(text)`                   | `<code>…</code>`                           |                                            |
-| `marked(text)`                 | `<mark>…</mark>`                           |                                            |
-| `sub(text)`                    | `<sub>…</sub>`                             |                                            |
-| `sup(text)`                    | `<sup>…</sup>`                             |                                            |
-| `br()`                         | `<br>`                                     | line break                                 |
-| `unsafeRawInline(input)`       | as-is                                      | not escaped, should use trusted HTML input |
-| `link(text, url)`              | `<a href="…">…</a>`                        | URL is escaped                             |
-| `email(text, address)`         | `<a href="mailto:…">…</a>`                 |                                            |
-| `phone(text, number)`          | `<a href="tel:…">…</a>`                    |                                            |
-| `userMention(text, userId)`    | `<a href="tg://user?id=…">…</a>`           |                                            |
-| `emoji(emojiId, alt)`          | `<tg-emoji emoji-id="…">alt</tg-emoji>`    |                                            |
-| `dateTime(text, unix, format)` | `<tg-time unix="…" format="…">…</tg-time>` | format like `wDT`                          |
-| `math(latex)`                  | `<tg-math>…</tg-math>`                     |                                            |
-| `anchorLink(text, name?)`      | `<a href="#…">…</a>`                       | empty name = top                           |
-| `reference(text, name)`        | `<tg-reference name="…">…</tg-reference>`  |                                            |
-| `referenceLink(text, name)`    | `<a href="#…">…</a>`                       | links to reference                         |
-| `button(text, options)`        | `<tg-button type="…">…</tg-button>`         | URL, callback, Web App, copy and other buttons |
+| Function                       | HTML output                                | Notes                                          |
+| ------------------------------ | ------------------------------------------ | ---------------------------------------------- |
+| `bold(text)`                   | `<b>…</b>`                                 |                                                |
+| `italic(text)`                 | `<i>…</i>`                                 |                                                |
+| `underline(text)`              | `<u>…</u>`                                 |                                                |
+| `strike(text)`                 | `<s>…</s>`                                 |                                                |
+| `spoiler(text)`                | `<tg-spoiler>…</tg-spoiler>`               |                                                |
+| `code(text)`                   | `<code>…</code>`                           |                                                |
+| `marked(text)`                 | `<mark>…</mark>`                           |                                                |
+| `sub(text)`                    | `<sub>…</sub>`                             |                                                |
+| `sup(text)`                    | `<sup>…</sup>`                             |                                                |
+| `br()`                         | `<br>`                                     | line break                                     |
+| `unsafeRawInline(input)`       | as-is                                      | not escaped, should use trusted HTML input     |
+| `link(text, url)`              | `<a href="…">…</a>`                        | URL is escaped                                 |
+| `email(text, address)`         | `<a href="mailto:…">…</a>`                 |                                                |
+| `phone(text, number)`          | `<a href="tel:…">…</a>`                    |                                                |
+| `userMention(text, userId)`    | `<a href="tg://user?id=…">…</a>`           |                                                |
+| `emoji(emojiId, alt)`          | `<tg-emoji emoji-id="…">alt</tg-emoji>`    |                                                |
+| `dateTime(text, unix, format)` | `<tg-time unix="…" format="…">…</tg-time>` | format like `wDT`                              |
+| `math(latex)`                  | `<tg-math>…</tg-math>`                     |                                                |
+| `anchorLink(text, name?)`      | `<a href="#…">…</a>`                       | empty name = top                               |
+| `reference(text, name)`        | `<tg-reference name="…">…</tg-reference>`  |                                                |
+| `referenceLink(text, name)`    | `<a href="#…">…</a>`                       | links to reference                             |
+| `button(text, options)`        | `<tg-button type="…">…</tg-button>`        | URL, callback, Web App, copy and other buttons |
 
 ### Block Builders (return `BlockNode`)
 
-| Function                           | HTML output                                                      | Notes                                                                                    |
-| ---------------------------------- | ---------------------------------------------------------------- | ---------------------------------------------------------------------------------------- |
-| `paragraph(text)` / `p(text)`      | `<p>…</p>`                                                       |                                                                                          |
-| `heading(level, text)`             | `<h1>…</h1>` … `<h6>…</h6>`                                      | level 1–6                                                                                |
-| `pre(text, language?)`             | `<pre><code class="language-…">…</code></pre>` or `<pre>…</pre>` |                                                                                          |
-| `footer(text)`                     | `<footer>…</footer>`                                             |                                                                                          |
-| `divider()`                        | `<hr/>`                                                          |                                                                                          |
-| `mathBlock(latex)`                 | `<tg-math-block>…</tg-math-block>`                               |                                                                                          |
-| `thinking(text)`                   | `<tg-thinking>…</tg-thinking>`                                  | only for `sendRichMessageDraft`                                                         |
-| `anchor(name)`                     | `<a name="…"></a>`                                               | standalone anchor                                                                        |
-| `blockquote(content, credit?, opts?)` | `<blockquote>…<cite>…</cite></blockquote>`                     | content can be inline or block; supports `expandable`                         |
-| `pullquote(text, credit?)`         | `<aside>…<cite>…</cite></aside>`                                 |                                                                                          |
-| `list(items, options?)`            | `<ul>…</ul>` or `<ol>…</ol>` with `<li>`                         | supports `ordered`, `start`, `type`, `reversed`, `value`, `checkbox`, `checked` per item |
-| `details(summary, content, opts?)` | `<details [open]>…</details>`                                    | content can be inline or block                                                           |
-| `table(rows, options?)`            | `<table [bordered] [striped] [compact]>…</table>`              | cells: `content`, `header`, `colspan`, `rowspan`, `align`, `valign`                      |
-| `map(lat, long, zoom, opts?)`      | `<tg-map lat="…" long="…" zoom="…"/>`                            | optionally wrapped in `<figure>`                                                         |
-| `buttonRow(buttons, opts?)`        | `<tg-button-row>…</tg-button-row>`                                  | optional left/center/right alignment                                                     |
-| `document(url, opts?)`             | `<tg-document src="…"></tg-document>`                              | optional caption and credit                                                             |
+| Function                              | HTML output                                                      | Notes                                                                                    |
+| ------------------------------------- | ---------------------------------------------------------------- | ---------------------------------------------------------------------------------------- |
+| `paragraph(text)` / `p(text)`         | `<p>…</p>`                                                       |                                                                                          |
+| `heading(level, text)`                | `<h1>…</h1>` … `<h6>…</h6>`                                      | level 1–6                                                                                |
+| `pre(text, language?)`                | `<pre><code class="language-…">…</code></pre>` or `<pre>…</pre>` |                                                                                          |
+| `footer(text)`                        | `<footer>…</footer>`                                             |                                                                                          |
+| `divider()`                           | `<hr/>`                                                          |                                                                                          |
+| `mathBlock(latex)`                    | `<tg-math-block>…</tg-math-block>`                               |                                                                                          |
+| `thinking(text)`                      | `<tg-thinking>…</tg-thinking>`                                   | only for `sendRichMessageDraft`                                                          |
+| `anchor(name)`                        | `<a name="…"></a>`                                               | standalone anchor                                                                        |
+| `blockquote(content, credit?, opts?)` | `<blockquote>…<cite>…</cite></blockquote>`                       | content can be inline or block; supports `expandable`                                    |
+| `pullquote(text, credit?)`            | `<aside>…<cite>…</cite></aside>`                                 |                                                                                          |
+| `list(items, options?)`               | `<ul>…</ul>` or `<ol>…</ol>` with `<li>`                         | supports `ordered`, `start`, `type`, `reversed`, `value`, `checkbox`, `checked` per item |
+| `details(summary, content, opts?)`    | `<details [open]>…</details>`                                    | content can be inline or block                                                           |
+| `table(rows, options?)`               | `<table [bordered] [striped] [compact]>…</table>`                | cells: `content`, `header`, `colspan`, `rowspan`, `align`, `valign`                      |
+| `map(lat, long, zoom, opts?)`         | `<tg-map lat="…" long="…" zoom="…"/>`                            | optionally wrapped in `<figure>`                                                         |
+| `buttonRow(buttons, opts?)`           | `<tg-button-row>…</tg-button-row>`                               | optional left/center/right alignment                                                     |
+| `document(url, opts?)`                | `<tg-document src="…"></tg-document>`                            | optional caption and credit                                                              |
 
 ### Media Builders
 
