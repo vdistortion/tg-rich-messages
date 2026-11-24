@@ -1,5 +1,12 @@
 # Changelog
 
+## Unreleased
+
+### Fixed
+
+- `map()` zoom now accepts 0..24 (was 13..20).
+- `buttonRow()` validates 1..8 buttons.
+
 ## 0.4.0 — 2026-09-17
 
 ### Added

@@ -150,6 +150,8 @@ export function buttonRow(
   buttons: readonly InlineNode[],
   options: ButtonRowOptions = {},
 ): BlockNode {
+  if (buttons.length < 1 || buttons.length > 8)
+    throw new TgRichError(`Button row has ${buttons.length} buttons (must be 1..8)`);
   return block(() => {
     const align = options.align ? ` align="${options.align}"` : '';
     return `<tg-button-row${align}>${buttons.map((b) => b.render()).join('')}</tg-button-row>`;
@@ -236,8 +238,8 @@ export interface MapOptions {
 export function map(lat: number, long: number, zoom: number, opts: MapOptions = {}): BlockNode {
   if (!Number.isFinite(lat) || !Number.isFinite(long))
     throw new TgRichError('Map lat/long must be finite numbers');
-  if (!Number.isInteger(zoom) || zoom < 13 || zoom > 20)
-    throw new TgRichError('Map zoom must be an integer 13..20');
+  if (!Number.isInteger(zoom) || zoom < 0 || zoom > 24)
+    throw new TgRichError('Map zoom must be an integer 0..24');
   return block(() => {
     const el = `<tg-map lat="${lat}" long="${long}" zoom="${zoom}"/>`;
     if (opts.caption === undefined && opts.credit === undefined) return el;

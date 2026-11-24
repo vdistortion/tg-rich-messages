@@ -308,9 +308,17 @@ describe('details / map', () => {
       '<figure><tg-map lat="41.9" long="12.5" zoom="14"/><figcaption>M</figcaption></figure>',
     );
   });
+  it('buttonRow requires 1..8 buttons', () => {
+    const b = button('x', { type: 'url', url: 'https://example.com' });
+    expect(() => buttonRow([])).toThrow(TgRichError);
+    expect(() => buttonRow(Array(9).fill(b))).toThrow(TgRichError);
+    expect(() => buttonRow(Array(8).fill(b))).not.toThrow();
+  });
   it('map throws on bad zoom / non-finite coords', () => {
-    expect(() => map(1, 1, 12)).toThrow(TgRichError);
-    expect(() => map(1, 1, 21)).toThrow(TgRichError);
+    expect(() => map(1, 1, -1)).toThrow(TgRichError);
+    expect(map(1, 1, 0).render()).toContain('zoom="0"');
+    expect(map(1, 1, 24).render()).toContain('zoom="24"');
+    expect(() => map(1, 1, 25)).toThrow(TgRichError);
     expect(() => map(NaN, 1, 14)).toThrow(TgRichError);
   });
 });

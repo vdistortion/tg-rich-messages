@@ -171,7 +171,7 @@ Template literal that:
 
 ### Error handling
 
-`TgRichError` is thrown on invalid input (e.g., heading size out of range, too many table columns, map zoom out of range).
+`TgRichError` is thrown on invalid input (e.g., heading size out of range, too many table columns, map zoom out of range, button row size).
 
 ### Escaping
 
